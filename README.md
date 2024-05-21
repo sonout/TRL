@@ -33,9 +33,9 @@ To install the required packages we recommend using [Conda](https://docs.conda.i
 
 2. Train Model with 
    ```sh
-   python train.py
+   python train.py --model <model_name>
    ```
 3. Evaluate Model with 
    ```sh
-   python evaluate.py
+   python evaluate.py --model <model_name> --task <tsk_name>
    ```
