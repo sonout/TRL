@@ -1,0 +1,14 @@
+city: sf
+min_lon: -122.5183
+min_lat: 37.6991
+max_lon: -122.32499
+max_lat: 37.8423
+#min_lon: -122.5183 #-122.8183 
+#min_lat: 37.085
+#max_lon: -121.5927
+#max_lat: 38.3473
+max_traj_len: 200
+min_traj_len: 5
+cell_size: 100.0
+cellspace_buffer: 500.0
+seed: 123

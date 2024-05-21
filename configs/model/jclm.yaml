@@ -1,0 +1,21 @@
+model_name: JCLM
+gpu_device_ids: [0,1]
+batch_size: 64 
+dataset_class: JCLMDataset
+city: porto
+seed: 123
+val_sample_size: 10000
+state_dict_path: models/states/porto/jcml/model.pt     
+#train_epochs: 1
+epochs: 5
+debug: False
+early_stopping: False
+model_args:
+  city: porto
+  emb_size: 128
+  hidden_size: 128
+  learning_rate: 0.0001
+  trans_mx_path: models/baselines/jclm_files/jclm_trans_mat_porto.npy   
+  
+
+

@@ -1,0 +1,51 @@
+model_name: TrajCL
+debug: False
+gpu_device_ids: [1]
+batch_size: 128
+city: porto
+seed: 123
+state_dict_path: models/states/porto/trajcl.pt
+epochs: 20
+debug: False
+early_stopping: False
+val_sample_size: 10000
+dataset_class: TrajCLDataset
+model_args:
+  city: porto
+  cell_embedding_dim: 256
+  model_files_path: models/token_embs/cell/ #models/baselines/trajcl_files
+  dataset_cell_file: porto_cell100_cellspace.pkl #porto_cell100_cellspace.pkl
+  embs_file: porto_cell_embs_node2vec256.pkl #porto_cell100_embs256.pkl
+  emb_size: 256
+  learning_rate: 0.001
+  cellroad_emb_dim: 256
+
+  trajcl_batch_size: 128 
+  cell_embedding_dim: 256
+  #seq_embedding_dim: 256 -> we have emb_size keyword
+  moco_nqueue: 2048 
+  moco_temperature: 0.05
+
+
+  trajcl_training_bad_patience: 5
+  trajcl_training_lr: 0.001
+  trajcl_training_lr_degrade_gamma: 0.5
+  trajcl_training_lr_degrade_step: 5
+  trajcl_aug1: mask
+  trajcl_aug2: subset
+  trajcl_local_mask_sidelen: 1100 #cell_size * 11
+
+  trans_attention_head: 4
+  trans_attention_dropout: 0.1
+  trans_attention_layer: 2
+  trans_pos_encoder_dropout: 0.1
+  trans_hidden_dim: 2048
+
+  # Traj Augs, the values are currently hardcoded
+  traj_simp_dist: 100
+  traj_shift_dist: 200
+  traj_mask_ratio: 0.3
+  traj_add_ratio: 0.3
+  traj_subset_ratio: 0.7 # preserved ratio
+
+  test_exp1_lcss_edr_epsilon: 0.25 # normalized

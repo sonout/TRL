@@ -1,0 +1,19 @@
+# Instead of using SRN2Vec road encoding (like Trembr), this model uses SkipGramToast. -> much better results
+model_name: Trembr
+gpu_device_ids: [1]
+batch_size: 128 #32
+val_sample_size: 10000
+model_args:
+  emb_size: 128
+  road_emb_size: 128
+  road_emb_model_path: models/states/porto/toast/toast_segments_porto.pt # SF: models/states/sf/toast/toast_segments_sf.pt    Porto: models/states/porto/toast_segments_porto.pt
+  learning_rate: 0.001
+  use_travel_time: True
+dataset_class: Trembr2Dataset
+city: porto
+seed: 123
+state_dict_path: models/states/porto/trembr2.pt
+train_epochs: 1
+epochs: 5
+debug: False
+early_stopping: False

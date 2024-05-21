@@ -1,0 +1,10 @@
+city: porto
+min_lon: -8.7005
+min_lat: 41.1001
+max_lon: -8.5192
+max_lat: 41.2086
+max_traj_len: 200
+min_traj_len: 20
+cell_size: 100.0
+cellspace_buffer: 500.0
+seed: 123

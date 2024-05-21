@@ -1,0 +1,22 @@
+model_name: Toast
+gpu_device_ids: [1]
+batch_size: 64
+val_sample_size: 10000
+model_args:
+  emb_size: 128
+  hidden_size: 128
+  hidden_size_ff: 128
+  max_len: 150
+  road_emb_size: 128
+  dropout: 0.2
+  n_heads: 4
+  n_layers: 2
+  road_emb_model_path: models/states/porto/toast/toast_segments_porto.pt   # SF: models/states/sf/toast/toast_segments_sf.pt  PORTO: models/states/porto/toast_segments_porto.pt
+  learning_rate: 0.001
+dataset_class: ToastDataset
+city: porto
+seed: 123
+state_dict_path: models/states/porto/toast/toast.pt
+epochs: 20
+debug: False
+early_stopping: False

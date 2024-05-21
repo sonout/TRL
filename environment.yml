@@ -1,0 +1,32 @@
+name: traj-emb
+channels:
+  - conda-forge
+  - nvidia
+  - pytorch
+  - pyg
+  - defaults
+dependencies:
+  - python=3.9
+  - pytorch::pytorch=1.11.0
+  - nvidia::cudatoolkit=11.3
+  - cudnn
+  - pyg::pyg
+  - numpy
+  - swifter
+  - shapely
+  - osmnx
+  - geopandas
+  - pip
+  - pip:
+      - pytorch-lightning
+      - seaborn
+      - matplotlib
+      - tqdm
+      - pyarrow
+      - fastdist
+      - hdbscan
+      - tensorboard
+      # Next to for random walks
+      - pybind11
+      - graph-walker
+      - fastparquet 

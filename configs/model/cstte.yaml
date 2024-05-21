@@ -1,0 +1,21 @@
+# This model is a simplyfied LSTM model based on the TrajCL model
+model_name: CSTTE
+debug: False
+gpu_device_ids: [1]
+batch_size: 128
+city: porto
+seed: 123
+state_dict_path: models/states/porto/cstte.pt
+val_sample_size: 10000
+epochs: 40
+debug: False
+early_stopping: False
+dataset_class: CSTTEDataset
+model_args:
+  city: porto
+  emb_size: 128
+  learning_rate: 0.001
+  cell_embedding_dim: 256 
+  grid_length: 250
+  vocab_size: 5864 # Porto 5864, SF
+  loss_temperature: 0.5

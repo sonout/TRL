@@ -1,0 +1,96 @@
+model_name: Start
+gpu_device_ids: [1]
+batch_size: 64
+val_sample_size: 10000
+model_args:
+  emb_size: 256
+  # hidden_size: 256
+  # road_emb_size: 128
+  road_features: 32 #porto: 27 sf:32
+  learning_rate: 0.0001
+  num_workers: 0
+  vocab_path: null
+  min_freq: 1
+  masking_ratio: 0.15
+  masking_mode: together
+  distribution: geometric # random
+  avg_mask_len: 2 #3
+
+  d_model: 256
+  mlp_ratio: 4
+  pretrain_road_emb: null
+  n_layers: 4 #2
+  attn_heads: 8 #4
+  seq_len: 128
+  future_mask: false
+  load_node2vec: false
+  dropout: 0.1
+  drop_path: 0.3
+  attn_drop: 0.1
+  type_ln: post
+  pooling: cls
+  add_cls: true
+  add_time_in_day: true
+  add_day_in_week: true
+  add_pe: true
+  add_temporal_bias: true
+  temporal_bias_dim: 64
+  use_mins_interval: false
+  add_gat: true
+  gat_heads_per_layer: [8, 16, 1]
+  gat_features_per_layer: [16, 16, 256]
+  gat_dropout: 0.1
+  gat_K: 1
+  gat_avg_last: true
+  load_trans_prob: true
+  append_degree2gcn: true
+  normal_feature: false
+  seed: 0
+  batch_size: 32
+  grad_accmu_steps: 32
+  max_epoch: 30
+  learner: adamw
+  lr_eta_min: 0
+  lr_warmup_epoch: 4
+  lr_warmup_init: 0.000006
+  lr_decay: true
+  lr_scheduler: cosinelr
+  lr_decay_ratio: 0.1
+  t_in_epochs: true
+  clip_grad_norm: true
+  max_grad_norm: 5
+  use_early_stop: true
+  patience: 10
+  test_every: 10
+  log_batch: 500
+  log_every: 1
+  l2_reg: null
+  n_views: 2
+  similarity: cosine
+  temperature: 0.05
+  contra_loss_type: simclr
+  contra_ratio: 0.4 #1.0
+  mlm_ratio: 0.6 #1.0
+  data_argument1: []
+  data_argument2: []
+  cutoff_row_rate: 0.2
+  cutoff_column_rate: 0.2
+  cutoff_random_rate: 0.2
+  sample_rate: 0.2
+  align_w: 1.0
+  unif_w: 1.0
+  align_alpha: 2
+  unif_t: 2
+  train_align_uniform: false
+  test_align_uniform: true
+  norm_align_uniform: false
+dataset_class: Start2Dataset
+city: sf
+seed: 123
+state_dict_path: models/states/sf/start2.pt
+transition_matrix_path: datasets/transition/sf/transition_matrix_static.npy
+saved_files_path: models/baselines/start_files
+#train_epochs: 1
+epochs: 30 #30
+debug: False
+early_stopping: False

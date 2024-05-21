@@ -1,0 +1,22 @@
+# This model is a simplyfied LSTM model based on the Trembr model
+model_name: Transformer
+gpu_device_ids: [0]
+batch_size: 128 
+dataset_class: TransformerDataset
+city: porto
+seed: 123
+val_sample_size: 10000
+state_dict_path: models/states/porto/transformer_road.pt
+epochs: 20
+debug: False
+early_stopping: False
+model_args:
+  emb_size: 128 
+  cell_or_road: road
+  cellroad_emb_dim: 128
+  cellroad_emb_path: models/token_embs/road/porto_road_embs_node2vec.pkl 
+  # Road: SF: models/token_embs/road/sf_road_embs_traj_skipgram.pkl ROAD: models/token_embs/road/porto_road_embs_node2vec.pkl 
+  # Cell: SF: models/token_embs/cell/sf_cell_embs_node2vec128.pkl ROAD: #models/token_embs/cell/porto_cell_embs_node2vec.pkl 
+  cellspace_path: models/token_embs/cell/porto_cell100_cellspace.pkl
+  learning_rate: 0.001
+  simclr_temperature: 0.05

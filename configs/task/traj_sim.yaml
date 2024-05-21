@@ -1,0 +1,19 @@
+name: TrajSim
+task: TrajSimTask
+city: porto
+seed: 123
+gpu_device_ids: [0]
+task_args:
+  metrics: [["top_k_accuracy", {"k": 1, "normalize": true}], ["top_k_accuracy", {"k": 5, "normalize": true}], ["top_k_accuracy", {"k": 10, "normalize": true}]]
+  learning_rate: 0.001
+  remove_outliers: True
+  remove_outliers_from_rank: 200
+batch_size: 32
+dataset_class: TrajSimDataset
+sample_size: 50000 
+db_neg_size:  10000
+db_query_size: 10000
+epochs: 1 # This is just a dummy epoch, we do not need to train anything for traj_sim
+early_stopping: False
+debug: False
+

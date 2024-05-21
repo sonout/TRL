@@ -1,0 +1,18 @@
+name: TravelTime
+task: TravelTimeTask
+city: porto
+seed: 123
+gpu_device_ids: [0]
+task_args:
+  metrics: [["neg_mean_squared_error", {"squared": False}], ["neg_mean_absolute_error", {}], ["neg_mean_absolute_percentage_error", {}]]
+  learning_rate: 0.001
+batch_size: 128
+dataset_class: TravelTimeDataset
+sample_size: 400000
+epochs: 10
+early_stopping: False
+monitor_metric: neg_mean_absolute_error
+mode: min
+min_delta: 1
+patience: 5
+debug: False

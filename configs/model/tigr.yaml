@@ -1,0 +1,42 @@
+model_name: TIGR
+gpu_device_ids: [0]
+batch_size: 128 #32
+dataset_class: FusionDataset3
+city: porto
+seed: 123
+val_sample_size: 10000
+state_dict_path: models/states/porto/tigr/model.pt            
+#train_epochs: 1
+epochs: 10
+debug: False
+early_stopping: False
+model_args:
+  n_layers: 2
+  emb_size: 512 
+  road_emb1_size: 64
+  road_emb2_size: 128
+  cell_emb_size: 256
+  time_emb_size: 64
+  #road_emb_size: 256 #128
+  #cellroad_emb_dim: 256
+  # Training
+  moco_nqueue: 2048 
+  moco_temperature: 0.05
+  learning_rate: 0.001
+  #use_travel_time: True
+  # Augmentations
+  view1: [trim, cut] # mask, trim, cutout
+  view2: [mask, trim, cut] # mask, trim, cutout
+  aug_prob: 0.85
+  # road
+  road_emb_path1: models/token_embs/road/porto_road_embs_sfc64.pkl #models/token_embs/road/porto_road_embs_sfc_one_layer_k_2.pkl #models/token_embs/road/sf_road_embs_sfc64.pkl 
+  road_emb_path2: models/token_embs/road/porto_road_embs_traj_skipgram.pkl #models/token_embs/road/porto_road_embs_traj_skipgram.pkl #models/token_embs/road/sf_road_embs_traj_skipgram.pkl 
+  #cell
+  dataset_cell_file: porto_cell100_cellspace.pkl
+  cell_embs_file: porto_cell_embs_node2vec256.pkl
+  model_files_path: models/token_embs/cell/
+  #time
+  time_emb_path: models/token_embs/time/
+  time2vec_path: models/proposed/time2vec/states/d2v_28_8641_5.667293785765455.pth  #models/proposed/time2vec/states/d2v_28_8641_5.667293785765455.pth #models/proposed/time2vec/states/d2v_33_9846_26.469513043455237.pth 
+  use_crossatt_fusion: True # If True: dim of road1 and time needs to be then same
+  

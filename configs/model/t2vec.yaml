@@ -1,0 +1,23 @@
+# This one uses Lightly library with different Training Framework (TiCO)
+model_name: T2Vec
+gpu_device_ids: [1]
+batch_size: 64
+dataset_class: T2VecDataset
+city: sf
+seed: 123
+state_dict_path: models/states/sf/t2vec.pt
+epochs: 20
+debug: False
+early_stopping: False
+val_sample_size: 10000
+model_args:
+  city: sf
+  model_files_path: models/token_embs/cell/ #models/baselines/trajcl_files
+  dataset_cell_file: sf_cell100_cellspace.pkl
+  embs_file: sf_cell_embs_node2vec256.pkl #porto_cell100_embs128.pkl
+  emb_size: 256
+  cell_embedding_dim: 256 #256
+  learning_rate: 0.001
+  cellroad_emb_dim: 256 #256
+
+
