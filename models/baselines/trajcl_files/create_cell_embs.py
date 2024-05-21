@@ -57,5 +57,5 @@ if __name__ == '__main__':
      device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
      model_files_path = "models/token_embs/cell"
-     cs_path = "/home/schestakov/projects/trajemb/models/token_embs/cell/sf_cell100_cellspace.pkl"
+     cs_path = "/projects/trajemb/models/token_embs/cell/sf_cell100_cellspace.pkl"
      init_cellspace(cell_emb_dim=64,model_files_path=model_files_path, data_config=data_config, device=device, cellspace_path=cs_path)

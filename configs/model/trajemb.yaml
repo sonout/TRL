@@ -3,7 +3,7 @@ gpu_device_ids: [1]
 batch_size: 32
 val_sample_size: 10000
 model_args:
-  emb_path: /home/schestakov/projects/trajemb/models/baselines/embeddings/porto/test_s_cltsim.pkl
+  emb_path: /projects/trajemb/models/baselines/embeddings/porto/test_s_cltsim.pkl
   emb_size: 128
 dataset_class: DummyDataset
 city: porto
