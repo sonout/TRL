@@ -98,7 +98,7 @@ Download San Francisco or Porto Dataset.
 
 For preprocessing use the following notebook:
 
-```
+```sh
 preprocessing
 ├── porto.ipynb
 └── sf.ipynb
