@@ -34,8 +34,33 @@ Downstream tasks:
 * Destination Prediction (destination)
 
 
+## Framework 
+
+![](./framework.png)
+
+**Configs:** Contains config files for the methods, downstream tasks, and dataset preprocessing.
+* model_config - Set all hyperparameters for the specific model.
+* task_config - Set parameters for the specific downstream task.
+* dataset_config - Set parameters for the dataset preprocessing.
+
+**Preprocessing:**
+Responsible for preprocessing the specific dataset.
+
+**Pipelines:**
+Pipeline for training and evaluation of a method.
+
+**Downstream Tasks:**
+Implemented Downstream Tasks that can be used to evaluate pre-trained TRL methods.
+
+**Models:**
+Here the TRL method implementations are stored and are further divided into the model implementations and the dataset implementations. 
+To create a new model, it needs to have its model_config, which references the implemented PyTorch Dataset and Module, which needs to follow the BaseModel structure.
+
+
+
 <!-- GETTING STARTED -->
-## Getting Started
+
+## Quick-Start
 
 ### Prerequisites
 To install the required packages we recommend using [Conda](https://docs.conda.io/en/latest/). Our used environment can be easily installed with conda.
@@ -53,20 +78,19 @@ To install the required packages we recommend using [Conda](https://docs.conda.i
    ```
 3. Activate the environment
    ```sh
-   conda activate traj-emb
+   conda activate trl
    ```
 
 <!-- USAGE EXAMPLES -->
 
 
-## Usage
 
 ### Datasets 
 
 Download San Francisco or Porto Dataset.
 
-* San Francisco (https://ieee-dataport.org/open-access/crawdad-epflmobility)
-* Porto (https://www.kaggle.com/datasets/crailtap/taxi-trajectory)
+* [San Francisco](https://ieee-dataport.org/open-access/crawdad-epflmobility)
+* [Porto](https://www.kaggle.com/datasets/crailtap/taxi-trajectory)
 
 
 
@@ -77,6 +101,7 @@ For preprocessing use the following notebook:
 ```
 preprocessing
 ├── porto.ipynb
+└── sf.ipynb
 ```
 
 ### Training and Evaluation
