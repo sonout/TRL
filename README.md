@@ -1,6 +1,37 @@
 <!-- ABOUT THE PROJECT -->
 <!-- ## About The Project -->
-# Trajectory Representation Learning on Road Networks and Grids
+# A framework for Trajectory Representation Learning (TRL)
+
+Trajectory Representation Learning (TRL) encodes raw spatio-temporal data into a compact feature vector, capturing essential trajectory characteristics. 
+This simplifies data analysis and removes the need for manual feature engineering and task-specific models. 
+Thus TRL facilitates the utilization of trajectory data for various downstream applications. 
+With this TRL framework, we provide researchers with a framework for training and evaluating existing TRL methods on various downstream tasks and data sets, and creating new TRL methods.
+Moreover, the framework is easily extensible to more tasks, datasets, and baselines. 
+
+Currently, the TRL framework supports the following methods, datasets, and tasks (in brackets are the command names for utilizing the specific method, dataset or task within the framework):
+
+TRL methods:
+* TIGR (tigr)
+* [Transformer](https://arxiv.org/abs/1706.03762) (transformer)
+* [t2vec](https://xiucheng.org/assets/pdfs/icde18-t2vec.pdf) (t2vec)
+* [CLT-Sim](https://zheng-kai.com/paper/cikm_2022_deng.pdf) (cltsim)
+* [CSTTE](https://arxiv.org/pdf/2207.14539v1) (cstte)
+* [TrajCL](https://arxiv.org/pdf/2210.05155) (trajcl)
+* [Trembr](https://dl.acm.org/doi/pdf/10.1145/3361741) (trembr)
+* [Toast](https://xiucheng.org/assets/pdfs/cikm21-rnr.pdf) (toast)
+* [JCLRNT](https://arxiv.org/pdf/2209.06389) (jclm)
+* [LightPath](https://arxiv.org/abs/2307.10171) (lightpath)
+* [START](https://arxiv.org/abs/2211.09510) (start)
+
+Datasets:
+* [Porto](https://www.kaggle.com/competitions/pkdd-15-taxi-trip-time-prediction-ii) (porto)
+* [San Francisco](https://ieee-dataport.org/open-access/crawdad-epflmobility) (sf)
+
+Downstream tasks:
+* Trajectory Similarity Computation (traj_sim)
+* Traveltime Estimation (traveltime)
+* Destination Prediction (destination)
+
 
 <!-- GETTING STARTED -->
 ## Getting Started
