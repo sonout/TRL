@@ -7,6 +7,7 @@ This simplifies data analysis and removes the need for manual feature engineerin
 Thus TRL facilitates the utilization of trajectory data for various downstream applications. 
 With this TRL framework, we provide researchers with a framework for training and evaluating existing TRL methods on various downstream tasks and data sets, and creating new TRL methods.
 Moreover, the framework is easily extensible to more tasks, datasets, and baselines. 
+The framework is implemented with pytorch-lightning and supports various training and validation visualizations in TensorBoard. 
 
 Currently, the TRL framework supports the following methods, datasets, and tasks (in brackets are the command names for utilizing the specific method, dataset or task within the framework):
 
