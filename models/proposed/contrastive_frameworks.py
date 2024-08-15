@@ -14,11 +14,11 @@ from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
 
-class MoCo_fusion3(nn.Module):
+class IntraInterContrastive(nn.Module):
     def __init__(self, encoder_road1, encoder_road2, encoder_cell, 
                  road1_nemb, road2_nemb, cell_nemb, nout,
                 queue_size, mmt = 0.999, temperature = 0.07):
-        super(MoCo_fusion3, self).__init__()
+        super(IntraInterContrastive, self).__init__()
         
         self.queue_size = queue_size
         self.mmt = mmt

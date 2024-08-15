@@ -1,7 +1,7 @@
 model_name: TIGR
 gpu_device_ids: [0]
 batch_size: 128 #32
-dataset_class: FusionDataset3
+dataset_class: TIGRDataset
 city: porto
 seed: 123
 val_sample_size: 10000
@@ -20,8 +20,8 @@ model_args:
   #road_emb_size: 256 #128
   #cellroad_emb_dim: 256
   # Training
-  moco_nqueue: 2048 
-  moco_temperature: 0.05
+  nqueue: 2048 
+  temperature: 0.05
   learning_rate: 0.001
   #use_travel_time: True
   # Augmentations
