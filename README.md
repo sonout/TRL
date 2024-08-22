@@ -104,9 +104,6 @@ preprocessing
 └── sf.ipynb
 ```
 
-
-
-
 ### Training and Evaluation
 
 1. Train Model with 
@@ -138,7 +135,7 @@ Implemented Downstream Tasks for Evaluation:
 
 
 
-### TIGR - Pretraining of Cell, Road & Temporal Embeddings
+### TIGR - Pretraining of Cell, Road & Temporal Embeddings for 
 
 For TIGR, we need to first pretrain cell, road and temporal embeddings. 
 Next, we describe how to train those and how to utilze the pretrained models within TIGR.
