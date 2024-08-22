@@ -13,6 +13,7 @@ from models.model_abtract import BaseModel
 from pipelines.utils import ROOT_DIR
 from .traj_enc_transformer import Transformer, MHA, precompute_freqs_cis
 from .contrastive_frameworks import IntraInterContrastive
+from models.token_embs.time.time2vec import Time2Vec
 
 class TIGR(pl.LightningModule, BaseModel):
     def __init__(self, config: dict):
@@ -38,6 +39,11 @@ class TIGR(pl.LightningModule, BaseModel):
                         temperature = config['temperature'])
 
         
+        self.time2vec = Time2Vec(k = self.time_emb_size, act = "cos", in_feats = 4)
+        state_dict_path = os.path.join(ROOT_DIR, config["time2vec_path"])
+        state_dict = torch.load(state_dict_path, map_location=self.device)
+        self.time2vec.load_state_dict(state_dict, strict=False)
+        
         self.att_fusion = LMA(self.time_emb_size, loc_seq_len = 1)
 
 
@@ -46,11 +52,11 @@ class TIGR(pl.LightningModule, BaseModel):
         road1_trajs1_emb, road1_trajs1_len, road1_trajs2_emb, road1_trajs2_len, _, _, \
             road2_trajs1_emb, road2_trajs1_len, road2_trajs2_emb, road2_trajs2_len, _, _, \
                 cell_trajs1_emb, cell_trajs1_len, cell_trajs2_emb, cell_trajs2_len, _, _, \
-                time1_embs, time2_embs, _ = batch
+                time1_feats, time2_feats, _ = batch
 
-
-        #road1_cat = torch.cat([road1_trajs1_emb, time1_embs], dim=-1)
-        #road2_cat = torch.cat([road1_trajs2_emb, time2_embs], dim=-1)
+        # encode time
+        time1_embs = self.time2vec.encode(time1_feats)
+        time2_embs = self.time2vec.encode(time2_feats)
 
         road1_cat = self.att_fusion(road1_trajs1_emb, time1_embs, road1_trajs1_len)
         road2_cat = self.att_fusion(road1_trajs2_emb, time2_embs, road1_trajs2_len)
@@ -77,13 +83,13 @@ class TIGR(pl.LightningModule, BaseModel):
     
     
     def predict_step(self, batch, batch_idx: int, dataloader_idx: int = 0):
-        # After dataset implementation, we do collate there, so here we get already all outputs after collate
-        #trajs_emb, trajs_emb_p, trajs1_len  = collate_for_test(X1, self.cellspace, self.embs)
-        #trajs1_emb, trajs1_emb_p, trajs1_len, trajs2_emb, trajs2_emb_p, trajs2_len, X_orig, X_p_orig, X_len = batch
         _, _, _, _, road1_trajs_emb, road1_trajs_len, \
             _, _, _, _, road2_trajs_emb, road2_trajs_len, \
             _, _, _, _, cell_trajs_emb, cell_trajs_len, \
                 _, _, time_emb = batch
+        
+        # encode time
+        time_emb = self.time2vec.encode(time_emb)
 
         road1_cat = self.att_fusion(road1_trajs_emb, time_emb, road1_trajs_len)
 

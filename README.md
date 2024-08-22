@@ -104,6 +104,9 @@ preprocessing
 └── sf.ipynb
 ```
 
+
+
+
 ### Training and Evaluation
 
 1. Train Model with 
@@ -133,3 +136,50 @@ Implemented Downstream Tasks for Evaluation:
 * traveltime (Travel Time Estimation)
 * destination (Destination Prediction)
 
+
+
+### TIGR - Pretraining of Cell, Road & Temporal Embeddings
+
+For TIGR, we need to first pretrain cell, road and temporal embeddings. 
+Next, we describe how to train those and how to utilze the pretrained models within TIGR.
+
+#### Preraining Temporal Embedding
+```sh
+python models/token_embs/time/train.py
+```
+
+After pretraining the temporal embedding model, the statedict is stored in folder: models/states/other. 
+Copy path to TIGR's model config for the key "time2vec_path".
+
+#### Preraining Dynamic Traffic Embeddings
+
+First we create the dynamic traffic matrix, utilizing following notebook:
+```sh
+models
+└── token_embs
+   └── src
+      └── road
+         └── calc_dynamic_traffic_mx.ipynb
+
+```
+Next we pretrain the dynamic traffic embeddings with:
+```sh
+python models/token_embs/src/road/train_dytraffic_embs.py
+```
+The embeddings are stored in models/token_embs/road/ and the correct path has to be indicated in TIGR's model config.
+
+
+#### Pretraining Road Embeddings
+
+For pretraining road embeddings run:
+```sh
+python models/token_embs/src/road/road_embs_training.py
+```
+
+#### Preraining Cell Embeddings
+
+For pretraining cellembedings run:
+
+```sh
+python models/token_embs/src/cell/cell_embs_training.py
+```
