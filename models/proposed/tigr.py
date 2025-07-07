@@ -3,11 +3,12 @@ import sys
 
 sys.path.append("../..")
 
-import json
+import math
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-import itertools
+import torch.nn.functional as F
+
 
 from models.model_abtract import BaseModel
 from pipelines.utils import ROOT_DIR
@@ -32,20 +33,18 @@ class TIGR(pl.LightningModule, BaseModel):
         self.model_cell = Transformer(self.cell_emb_size, nlayer=config['n_layers']) 
 
         proj_dim = 128 #emb_size // 2
-        self.contrastive = IntraInterContrastive(self.model_road1, self.model_road2, self.model_cell,
+        self.moco = IntraInterContrastive(self.model_road1, self.model_road2, self.model_cell,
                         self.road_emb1_size, self.road_emb2_size, self.cell_emb_size,
                         proj_dim, 
                         config['nqueue'],
                         temperature = config['temperature'])
 
-        
         self.time2vec = Time2Vec(k = self.time_emb_size, act = "cos", in_feats = 4)
         state_dict_path = os.path.join(ROOT_DIR, config["time2vec_path"])
         state_dict = torch.load(state_dict_path, map_location=self.device)
         self.time2vec.load_state_dict(state_dict, strict=False)
-        
-        self.att_fusion = LMA(self.time_emb_size, loc_seq_len = 1)
 
+        self.att_fusion = LMA(self.time_emb_size, loc_seq_len = config["lma_seq_len"])
 
 
     def training_step(self, batch, batch_idx):
@@ -58,11 +57,12 @@ class TIGR(pl.LightningModule, BaseModel):
         time1_embs = self.time2vec.encode(time1_feats)
         time2_embs = self.time2vec.encode(time2_feats)
 
+
         road1_cat = self.att_fusion(road1_trajs1_emb, time1_embs, road1_trajs1_len)
         road2_cat = self.att_fusion(road1_trajs2_emb, time2_embs, road1_trajs2_len)
         
         
-        loss = self.contrastive({'x': road1_cat, 'lengths':road1_trajs1_len},
+        loss = self.moco({'x': road1_cat, 'lengths':road1_trajs1_len},
                          {'x': road2_cat, 'lengths':road1_trajs2_len},
                          {'x': road2_trajs1_emb, 'lengths':road2_trajs1_len},
                          {'x': road2_trajs2_emb, 'lengths':road2_trajs2_len},
@@ -93,7 +93,7 @@ class TIGR(pl.LightningModule, BaseModel):
 
         road1_cat = self.att_fusion(road1_trajs_emb, time_emb, road1_trajs_len)
 
-        z = self.contrastive.encode({'x': road1_cat, 'lengths':road1_trajs_len},{'x': road2_trajs_emb, 'lengths':road2_trajs_len}, {'x': cell_trajs_emb, 'lengths':cell_trajs_len})
+        z = self.moco.encode({'x': road1_cat, 'lengths':road1_trajs_len},{'x': road2_trajs_emb, 'lengths':road2_trajs_len}, {'x': cell_trajs_emb, 'lengths':cell_trajs_len})
         return z
 
     
@@ -110,14 +110,14 @@ class TIGR(pl.LightningModule, BaseModel):
         return self.__class__.__name__
 
 
+
 class LMA(nn.Module):
-    def __init__(self, dim, loc_seq_len = None, dropout = 0.1):
+    def __init__(self, dim, loc_seq_len = 1, dropout = 0.1):
         super(LMA, self).__init__()
 
-        if loc_seq_len is None:
-            self.loc_seq_len = 1
-        else:
-            self.loc_seq_len = loc_seq_len
+        # Ensure loc_seq_len is at least 1
+        self.loc_seq_len = max(1, loc_seq_len if loc_seq_len is not None else 1)
+
         self.Wq1 = nn.Linear(dim, dim, bias=False)
         self.Wk1 = nn.Linear(dim, dim, bias=False)
         self.Wv1 = nn.Linear(dim, dim, bias=False)
@@ -140,14 +140,41 @@ class LMA(nn.Module):
         )
         self.layer_norm = nn.LayerNorm(dim*2, eps=1e-6)
 
-    def forward(self, seq_s, seq_t, len): # seq_s/seq_t shape [N, L, D]
-        N, L, D = seq_s.size()
+    def forward(self, seq_s, seq_t, seq_lengths): # seq_s/seq_t shape [N, L, D]
+        N, L_orig, D = seq_s.size()
+        _N_t, _L_t, _D_t = seq_t.size()
+
+        # Basic input validation
+        assert L_orig == _L_t and D == _D_t, "Input sequences seq_s and seq_t must have same L and D dimensions."
+        assert N == len(seq_lengths), "Batch size mismatch between input tensors and seq_lengths."
+        assert N == _N_t, "Batch size mismatch between seq_s and seq_t."
+
+        pad_amount = 0
+        if L_orig % self.loc_seq_len != 0:
+            target_len = math.ceil(L_orig / self.loc_seq_len) * self.loc_seq_len
+            pad_amount = target_len - L_orig
+            L_padded = target_len
+        else:
+            L_padded = L_orig # No padding needed
+
+        if pad_amount > 0:
+            # Pad tensors on the right of the sequence dimension (dim 1)
+            # Pad format: (pad_left, pad_right, pad_top, pad_bottom, ...)
+            seq_s_padded = F.pad(seq_s, (0, 0, 0, pad_amount), mode='constant', value=0.0)
+            seq_t_padded = F.pad(seq_t, (0, 0, 0, pad_amount), mode='constant', value=0.0)
+        else:
+            seq_s_padded = seq_s
+            seq_t_padded = seq_t
+        seq_s = seq_s_padded
+        seq_t = seq_t_padded
+
+        ##########
         q1 = self.Wq1(seq_s)
         k1 = self.Wk1(seq_t)
         v1 = self.Wv1(seq_t)
 
-        assert L % self.loc_seq_len == 0, f"Sequence Length {L} should be divisible by loc_seq_len {self.loc_seq_len}"
-        n_heads = L // self.loc_seq_len #5
+        assert L_padded % self.loc_seq_len == 0, f"Sequence Length {L_padded} should be divisible by loc_seq_len {self.loc_seq_len}"
+        n_heads = L_padded // self.loc_seq_len #5
 
         q1 = q1.view(N, n_heads, self.loc_seq_len, D) # [N, Heads, L_loc, D]
         k1 = k1.view(N, n_heads, self.loc_seq_len, D) # [N, Heads, L_loc, D]
@@ -156,7 +183,7 @@ class LMA(nn.Module):
         output1 = torch.nn.functional.scaled_dot_product_attention(q1, k1, v1, attn_mask=None, dropout_p=self.dropout if self.training else 0.0, is_causal=False)
 
         # restore orig shape
-        output1 = output1.view(N, L, D)
+        output1 = output1.reshape(N, L_padded, D)
         output1 = self.FFN1(output1) + output1
 
         q2 = self.Wq2(seq_t)
@@ -169,14 +196,10 @@ class LMA(nn.Module):
 
         output2 = torch.nn.functional.scaled_dot_product_attention(q2, k2, v2, attn_mask=None, dropout_p=self.dropout if self.training else 0.0, is_causal=False)
         # restore orig shape
-        output2 = output2.view(N, L, D)
+        output2 = output2.reshape(N, L_padded, D)
         output2 = self.FFN2(output2) + output2
 
-        out = torch.cat([output1, output2], dim=-1) # [N, L, 2*D]
-        out = self.layer_norm(out)
+        out = torch.cat([output1, output2], dim=-1) # [N, L_padded, 2*D]
+        out = self.layer_norm(out[:, :L_orig, :]) # [N, L_orig, 2*D]
 
         return out
-
-
-    
-

@@ -57,9 +57,9 @@ class TIGRDataset(Dataset):
 
 
         ### TIME ###
-        #time_embs_filepath = os.path.join(ROOT_DIR, config["time_emb_path"], f"{city}_time_embs_{len(data)}.pkl")
+        # For TTE task, we use only first timestamp and estimate the rest.
         if data.road_timestamps.values[0][0] == data.road_timestamps.values[0][-1]:
-            print("WE ESTIMEATE TIMESTAMPS!!")
+            print("We estimate timestamps!")
             start_times = [seq[0] for seq in data['road_timestamps'].values]
             travel_times = edge_df['traveltime'].values
 
@@ -87,12 +87,15 @@ class TIGRDataset(Dataset):
         view1 = config["view1"]
         view2 = config["view2"] 
         p = config["aug_prob"]
+        p_mask = config["mask_ratio"]
+        p_cut = config["cut_ratio"]
+        p_trim = 1 - config["trim_ratio"]
 
         transform_dict = {
-            "mask": [T.Mask(p=p), T.Mask_with_time(p=p)],
-            "trim": [T.Subset(p=p), T.Subset_with_time(p=p)],
-            "cutout": [T.ConsecutiveMasking(p=p), T.ConsecutiveMaskingWithTime(p=p)],
-            "cut": [T.ConsecutiveMasking(p=p), T.ConsecutiveMaskingWithTime(p=p)],
+            "mask": [T.Mask(p=p, traj_mask_ratio=p_mask), T.Mask_with_time(p=p, traj_mask_ratio=p_mask)],
+            "trim": [T.Subset(p=p, traj_subset_ratio = p_trim), T.Subset_with_time(p=p, traj_subset_ratio = p_trim)],
+            "cutout": [T.ConsecutiveMasking(p=p, traj_mask_ratio = p_cut), T.ConsecutiveMaskingWithTime(p=p, traj_mask_ratio = p_cut)],
+            "cut": [T.ConsecutiveMasking(p=p, traj_mask_ratio = p_cut), T.ConsecutiveMaskingWithTime(p=p, traj_mask_ratio = p_cut)],
         }
 
         self.transform1 = T.Compose([transform_dict[aug][0] for aug in view1])

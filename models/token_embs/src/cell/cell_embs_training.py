@@ -3,17 +3,24 @@ import sys
 import pickle
 import torch
 import math
+import yaml
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
 
 from cellspace import CellSpace
-from node2vec import train_node2vec
 import argparse
 
-from models.token_embs.src.cell.init_cs import init_cs
-from pipelines.utils import ROOT_DIR, load_config
+import init_cs
 import time
 from torch_geometric.nn import Node2Vec
+
+
+def load_config(name: str, ctype: str) -> Dict[str, Any]:
+    return yaml.safe_load(
+        Path(os.path.join(ROOT_DIR, "configs", ctype, f"{name}.yaml")).read_text()
+    )
 
 
 """
@@ -103,9 +110,8 @@ def main(args):
     data_config = load_config(name=args.city, ctype="dataset")
     data_config['ROOT_DIR'] = ROOT_DIR
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
-
-    cellspace = init_cs(data_config['min_lon'], data_config['min_lat'], data_config['max_lon'], data_config['max_lat'], data_config['cellspace_buffer'], data_config['cell_size'])
-
+    print(data_config["city"])
+    cellspace = init_cs.init_cs(data_config['min_lon'], data_config['min_lat'], data_config['max_lon'], data_config['max_lat'], data_config['cellspace_buffer'], data_config['cell_size'])
 
     _, edge_index = cellspace.all_neighbour_cell_pairs_permutated_optmized()
     edge_index = torch.tensor(edge_index, dtype = torch.long, device = device).T
@@ -117,7 +123,7 @@ def main(args):
 if __name__ == '__main__':
      
     parser = argparse.ArgumentParser(description="Train road embedding models")
-    parser.add_argument("--city", type=str, default="sf", help="City name")
+    parser.add_argument("--city", type=str, default="cd", help="City name")
     parser.add_argument("--device", type=str, default="cuda:0" if torch.cuda.is_available() else "cpu", help="Device for training")
     parser.add_argument("--emb_dim", type=int, default=256, help="Embedding dimension")
     parser.add_argument("--epochs", type=int, default=10000, help="Epochs for training")
